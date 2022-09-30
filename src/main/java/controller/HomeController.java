@@ -167,8 +167,6 @@ public class HomeController {
 	
 	@RequestMapping("/schedule_show.do")
 	public String article_info_list(Model model, int schedule_idx) {
-		System.out.println("idx:"+schedule_idx);
-		System.out.println("들어오니?");
 		
 		List<ScheduleDto> list= schedule_dao.get(schedule_idx);
 		model.addAttribute("schedule_show",list);
@@ -184,8 +182,6 @@ public class HomeController {
 		System.out.println(list);
 		return "/WEB-INF/views/schedule/calendar_list.jsp";
 	}
-
-	
 	
 	/*
 	 * //글 수정 폼으로 이동
@@ -224,9 +220,10 @@ public class HomeController {
 	@RequestMapping("/delete.do")
 	public String schedule_delete (int schedule_idx) {
 		//ScheduleDao scheduleDao = sqlSession.getMapper(ScheduleDao.class);
-		System.out.println("schedule_idx : " + schedule_idx);
+		System.out.println("외 않두러화 schedule_idx : " + schedule_idx);
 		schedule_dao.delete(schedule_idx);
-		return "redirect:calendar_list.do";
+		
+		return null;
 	}
 	
 }

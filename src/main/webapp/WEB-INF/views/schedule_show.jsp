@@ -296,19 +296,20 @@ body {
 							value="${schedule_show.schedule_mycolor}" />
 						</li>
 						
-						</form>
 						
+					</form>	
 						<li class="button_li">
 							<div class="managebutton">
 								<button type="submit" data-oper='modify'
 									class="buttonstyle board_manage_go pointer">Modify</button>
 									
-									<c:out value="${schedule_show.schedule_idx}" />
-									
-								<button type="button" onclick="del(this.form);"
+							<form method="POST" action="delete.do?schedule_idx=${schedule_show.schedule_idx}">	
+								<input type="hidden"  name="schedule_idx" value="${schedule_show.schedule_idx}" />
+								<button type="button" onclick="del(this.form); closeTabClick();"
 									class="buttonstyle2 board_manage_go pointer">Delete</button>
-								<!-- <button type="submit" data-oper='delete' onclick="del(this.form);"
+								<!-- <button type="submit" data-oper='delete'
 									class="buttonstyle2 board_manage_go pointer">Delete</button> -->
+							</form>
 							</div>
 						</li>
 					</ul>
@@ -325,11 +326,15 @@ body {
 	<script>
 	
 	function del(f) {
-		alert(f);
-		consol.log(${schedule_show.schedule_idx});
-		f.submit();
+		//window.close();
+		//location.href='/delete.do?schedule_idx='+f.schedule_show_idx.value;
+		f.sumbit();
+		return closeTabClick();
 	}
-	
+	function closeTabClick() {
+    	// 변수를 close해 새창을 닫음
+    	window.close();
+	}
 	
 	/* 수정버튼과 삭제버튼 클릭 시 수행되는 코드 */
 	$(document).ready(function(){
