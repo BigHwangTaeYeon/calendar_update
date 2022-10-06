@@ -13,10 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 //import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import dao.ScheduleDao;
@@ -159,7 +161,7 @@ public class HomeController {
 	@RequestMapping(value="/schedule_show", method=RequestMethod.GET)
 	public String schedule_show (Model model, HttpServletRequest request, @RequestParam("schedule_idx") int idx, RedirectAttributes rttr) {
 		//ScheduleDao scheduleDao = sqlSession.getMapper(ScheduleDao.class);
-		String url = "redirect:calendar.do";
+//		String url = "redirect:calendar.do";
 		schedule_dao.get(idx);
 		model.addAttribute("schedule_show",schedule_dao.get(idx));
 		return null;
@@ -167,10 +169,10 @@ public class HomeController {
 	
 	@RequestMapping("/schedule_show.do")
 	public String article_info_list(Model model, int schedule_idx) {
-		
-		List<ScheduleDto> list= schedule_dao.get(schedule_idx);
+		//List<ScheduleDto> list= schedule_dao.get(schedule_idx);
+		ScheduleDto list = schedule_dao.get(schedule_idx);	// dao에서 selectOne을 사용하면, forEach를 사용하지 않고 바로 schedule_show.schedule_idx처럼 사용 가능하다
 		model.addAttribute("schedule_show",list);
-		System.out.println(list);
+		System.out.println("schedule_show " + list);
 		return "/WEB-INF/views/schedule_show.jsp";
 	}
 	
@@ -195,19 +197,49 @@ public class HomeController {
 	 * return "WEB-INF/views/schedule_show.jsp"; }
 	 */
 	
-	@RequestMapping(value="modify", method=RequestMethod.GET)
-	public String schedule_modify (Model model, HttpServletRequest request, ScheduleDto scheduleDto, RedirectAttributes rttr) {
-		//ScheduleDao scheduleDao = sqlSession.getMapper(ScheduleDao.class);
-		schedule_dao.update(scheduleDto);
-		model.addAttribute("schedule_modify",schedule_dao.update(scheduleDto));
-		return "/modify";
+//	@RequestMapping("modify")
+//	public String schedule_modify (Model model, HttpServletRequest request, ScheduleDto scheduleDto, RedirectAttributes rttr) {
+//		//ScheduleDao scheduleDao = sqlSession.getMapper(ScheduleDao.class);
+//		schedule_dao.update(scheduleDto);
+//		model.addAttribute("schedule_modify",schedule_dao.update(scheduleDto));
+//		return "/modify";
+//	}
+	
+//	@RequestMapping("/modify.do")
+//	public String modify(ScheduleDto scheduleDto, HttpServletRequest request) {
+//		System.out.println("들어오니? 수정 " + scheduleDto);
+//		int res = schedule_dao.update(scheduleDto);
+//		
+//		return "/WEB-INF/views/schedule_show.jsp";
+//	}
+	
+	@RequestMapping("/modify.do")
+	@ResponseBody
+	public String modify(int schedule_idx, ScheduleDto scheduleDto) {
+		System.out.println("들어오니? idx " + schedule_idx);
+		System.out.println("들어오니? DTO " + scheduleDto);
+		int res = schedule_dao.update(scheduleDto);
+
+		String result = "no";
+		if(res != 0) {
+			result="yes";
+		}
+		return result;
 	}
 	
-	@RequestMapping(value="modify.do", method=RequestMethod.GET)
-	public String modify(ScheduleDto scheduleDto) {
-		int res = schedule_dao.update(scheduleDto);
-		return "/modify";
-	}
+//	@RequestMapping("/modify.do")
+//	@RequestMapping(value = "/modify.do", method = { RequestMethod.POST })
+//	public String modify(@RequestBody("idx") String idx) throws Exception {
+//		System.out.println("들어오니? idx " + schedule_idx);
+//		System.out.println("들어오니? DTO " + scheduleDto);
+//		int res = schedule_dao.update(scheduleDto);
+//
+//		String result = "no";
+//		if(res != 0) {
+//			result="yes";
+//		}
+//		return result;
+//	}
 	
 //	@RequestMapping(value="delete.do", method=RequestMethod.GET)
 //	public String schedule_delete (Model model, HttpServletRequest request, 
@@ -217,13 +249,19 @@ public class HomeController {
 //		model.addAttribute("schedule_delete",schedule_dao.delete(scheduleDto));
 //		return null;
 //	}
+	
 	@RequestMapping("/delete.do")
+	@ResponseBody
 	public String schedule_delete (int schedule_idx) {
 		//ScheduleDao scheduleDao = sqlSession.getMapper(ScheduleDao.class);
 		System.out.println("외 않두러화 schedule_idx : " + schedule_idx);
-		schedule_dao.delete(schedule_idx);
+		int res = schedule_dao.delete(schedule_idx);
 		
-		return null;
+		String result = "no";
+		if(res != 0) {
+			result="yes";
+		}
+		return result;
 	}
 	
 }

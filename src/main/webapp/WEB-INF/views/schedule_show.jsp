@@ -6,7 +6,9 @@
 <html lang="ko">
 <head>
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
+<!-- <script src=“https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js“></script> --> <!-- Ajax -->
+<script src="${pageContext.request.contextPath}/resources/js/httpRequest.js"></script> <!-- Ajax -->
 <!-- jquery datepicker -->
 <!-- <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script> -->
@@ -225,14 +227,7 @@ body {
 
       <!-- share 값에 따라 공개, 비공개 체크 상태 -->
 	<script type="text/javascript">
-	<c:forEach var="schedule_show" items="${schedule_show}">
-	<input type="hidden" name="schedule_idx" value="${vo.schedule_idx}" />
-				if(${schedule_show.schedule_share}=="1") {
-					document.getElementById("first_radio").checked = true;
-				} else {
-					document.getElementById("second_radio").checked = true;
-				}
-				</c:forEach>
+	
 				
      </script>
                
@@ -245,21 +240,21 @@ body {
 
 			<div class="bottom">
 				<div class="info">* 변경 혹은 삭제된 일정은 복구할 수 없습니다.</div>
-				
-				<form role="form" name="schedule_modify" >
+		
+			<form role="form" name="schedule_modify">
 				<input type="hidden" name="year" value="${today_info.search_year}" />
 				<input type="hidden" name="month" value="${today_info.search_month-1}" />
+				<input type="hidden" name="schedule_idx" value="${schedule_show.schedule_idx}" />
+				
 				<div class="contents">
 					<ul>
 				
-		<c:forEach var="schedule_show" items="${schedule_show}">
-		<input type="hidden" name="schedule_idx" value="${schedule_show.schedule_idx}" />
-		<c:out value="${schedule_show.schedule_idx}" />
+		<%-- <input type="hidden" name="schedule_idx" value="${schedule_show.schedule_idx}" /> --%>
 						<li>
 							<div class="text_subject">순번 :</div>
 							<div class="text_desc">
 								<input type="text" name="schedule_num" class="text_type1"
-									value="${schedule_show.schedule_num }" />
+									value="${schedule_show.schedule_num}" />
 							</div>
 						</li>
 						<li>
@@ -267,14 +262,15 @@ body {
 							<div class="text_desc">
 								<input type="text" name="schedule_date" class="text_type1"
 									id="testDatepicker" readonly="readonly"
-									value="${schedule_show.schedule_date }" />
+									value="${schedule_show.schedule_date}" />
 							</div>
 						</li>
 						<li>
 							<div class="text_subject">제목 :</div>
 							<div class="text_desc">
-							<textarea name="schedule_subject" class="textarea_type1" rows="1" style="resize: none;">${schedule_show.schedule_subject}</textarea>
-								<%-- <input type="text" name="schedule_subject" class="text_type1"
+							<textarea name="schedule_subject" class="textarea_type1" rows="1">${schedule_show.schedule_subject}</textarea>
+<%-- 							<textarea name="schedule_subject" class="textarea_type1" rows="1" style="resize: none;">${schedule_show.schedule_subject}</textarea>
+ --%>								<%-- <input type="text" name="schedule_subject" class="text_type1"
 									value=${schedule_show.schedule_subject }></input> --%>
 							</div>
 						</li>
@@ -295,17 +291,19 @@ body {
 							type='color' name='schedule_mycolor'
 							value="${schedule_show.schedule_mycolor}" />
 						</li>
-						
-						
-					</form>	
 						<li class="button_li">
 							<div class="managebutton">
-								<button type="submit" data-oper='modify'
-									class="buttonstyle board_manage_go pointer">Modify</button>
-									
-							<form method="POST" action="delete.do?schedule_idx=${schedule_show.schedule_idx}">	
+								<input type="button" onclick="modify(this.form);" value="Modify" class="buttonstyle board_manage_go pointer"/>
+						
+						
+							<%-- <form method="POST" action="modify.do?schedule_idx=${schedule_show.schedule_idx}"> --%>
+								<!-- <button type="button" data-oper='modify' onclick="modify(this.form);"
+									class="buttonstyle board_manage_go pointer">Modify</button> -->
+				</form>
+				
+							<form>	
 								<input type="hidden"  name="schedule_idx" value="${schedule_show.schedule_idx}" />
-								<button type="button" onclick="del(this.form); closeTabClick();"
+								<button type="button" onclick="del(this.form);"
 									class="buttonstyle2 board_manage_go pointer">Delete</button>
 								<!-- <button type="submit" data-oper='delete'
 									class="buttonstyle2 board_manage_go pointer">Delete</button> -->
@@ -314,27 +312,75 @@ body {
 						</li>
 					</ul>
 					
-		</c:forEach>
-					</form>
-					
-					
-					
-					
 				</div>
 			</div>
 	
 	<script>
 	
 	function del(f) {
-		//window.close();
-		//location.href='/delete.do?schedule_idx='+f.schedule_show_idx.value;
-		f.sumbit();
-		return closeTabClick();
+		var url = "delete.do";
+		var param = "schedule_idx="+f.schedule_idx.value;
+		
+		sendRequest(url,param,resultFunc,"POST");
 	}
-	function closeTabClick() {
-    	// 변수를 close해 새창을 닫음
-    	window.close();
+	
+	function modify(f) {
+		// f.submit();
+		var url = "modify.do";
+		var param = "schedule_idx="+f.schedule_idx.value+
+			"&schedule_num="+f.schedule_num.value+
+			"&schedule_subject="+f.schedule_subject.value+
+			"&schedule_desc="+f.schedule_desc.value+
+			"&schedule_date="+f.schedule_date.value+
+			"&schedule_share="+f.schedule_share.value+
+			"&schedule_mycolor="+f.schedule_mycolor.value;
+		
+		sendRequest(url,param,resultFunc,"POST");
 	}
+	
+	function resultFunc() {
+		if(xhr.readyState == 4 && xhr.status == 200) {
+			var data = xhr.responseText;
+			opener.parent.location.reload();	// 팝업 창 닫고, 부모 창 리로드
+			window.close();
+		}
+	}
+	
+	/* function modify(f) {
+		//f.submit();
+		//var url = "modify.do";
+		//var param = "schedule_idx="+f.schedule_idx.value;
+		
+		//if(param=="schedule_idx=63") {
+		//	alert("yes1")
+		//}	else {
+		//	alert("no1")
+		//}
+		//sendRequest(url,param,resultFunc,"POST");
+		
+		$.ajax({
+			url : "modify.do",
+			type : 'post',
+			data : {
+				idx : "가나",
+				schedule_num : "다라",
+				/* schedule_subject : f.schedule_subject.value,
+				schedule_desc : f.schedule_desc.value,
+				schedule_date : f.schedule_date.value,
+				schedule_share : f.schedule_share.value,
+				schedule_mycolor : f.schedule_mycolor.value
+			},	
+			success : function(data) {
+				alert("success");
+		     },
+			error : function() {
+				alert("error");
+			}
+		});
+		
+	} */
+	
+	
 	
 	/* 수정버튼과 삭제버튼 클릭 시 수행되는 코드 */
 	$(document).ready(function(){

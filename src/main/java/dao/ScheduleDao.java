@@ -39,8 +39,8 @@ public class ScheduleDao {
 	
 	/* 수정, 삭제를 위한 리스트 불러오기 */
 	/* 조회하기 */
-	public List<ScheduleDto> get(int schedule_idx) {
-		List<ScheduleDto> list = sqlSession.selectList("schedule.get", schedule_idx);
+	public ScheduleDto get(int schedule_idx) {
+		ScheduleDto list = sqlSession.selectOne("schedule.get", schedule_idx);
 		return list;
 	}
 	public List<ScheduleDto> selectInfo(int idx){
@@ -54,7 +54,9 @@ public class ScheduleDao {
 //		return res;
 //	}
 	public int update(ScheduleDto scheduleDto) {
+		System.out.println("1");
 		int res = sqlSession.update("schedule.update", scheduleDto);
+		System.out.println("2");
 		return res;
 	}
 	

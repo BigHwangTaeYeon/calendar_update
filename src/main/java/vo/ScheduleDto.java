@@ -13,10 +13,10 @@ public class ScheduleDto {
 	String schedule_subject;
 	String schedule_desc;
 	Date schedule_date;
-	
 	//-------------
 	String schedule_share;	// 공개 비공개, 1,2
 	String schedule_mycolor;
+	
 	public int getSchedule_idx() {
 		return schedule_idx;
 	}
